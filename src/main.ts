@@ -46,7 +46,7 @@ function populateDateFilter() {
   uniqueDates.forEach((date) => {
     const option = document.createElement("option");
     option.value = date;
-    option.textContent = new Date(date).toLocaleDateString(); // Format lokal
+    option.textContent = new Date(date).toLocaleDateString("id-ID"); // Format lokal
     dateSelect.appendChild(option);
   });
 
@@ -59,13 +59,18 @@ function populateDateFilter() {
 
 function applyFilter() {
   const selectedDate = (document.getElementById("date-filter") as HTMLSelectElement).value;
-  
+
   if (selectedDate) {
     filteredData = renderedData.filter((entry) => entry.time.startsWith(selectedDate));
+    // Keep filtered dates DESC (paling baru di atas)
+    filteredData.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
   } else {
-    filteredData = renderedData;
+    filteredData = [...renderedData]; // Copy all data
+    // Sort ascending jika filter ALL
+    filteredData.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
   }
 
+  currentPage = 1;
   setupPagination();
   displayPage(currentPage);
 }
@@ -104,7 +109,7 @@ function displayPage(page: number) {
   pageData.forEach((entry) => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${new Date(entry.time).toLocaleString()}</td>
+      <td>${new Date(entry.time).toLocaleString("id-ID")}</td>
       <td>${renderTemperatureBadge(entry.temperature)}</td>
     `;
     tableBody.appendChild(row);
